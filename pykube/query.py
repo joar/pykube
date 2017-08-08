@@ -138,6 +138,9 @@ class Query(BaseQuery):
         return self.query_cache["response"]
 
 
+WatchEvent = namedtuple("WatchEvent", "type object")
+
+
 class WatchQuery(BaseQuery):
 
     def __init__(self, *args, **kwargs):
@@ -158,7 +161,6 @@ class WatchQuery(BaseQuery):
             kwargs["version"] = self.api_obj_class.version
         r = self.api.get(**kwargs)
         self.api.raise_for_status(r)
-        WatchEvent = namedtuple("WatchEvent", "type object")
         for line in r.iter_lines():
             we = json.loads(line.decode("utf-8"))
             yield WatchEvent(type=we["type"], object=self.api_obj_class(self.api, we["object"]))
